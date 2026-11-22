@@ -3,7 +3,7 @@ export const SUPABASE_URL =
   "https://aofyxopehqjzxcszmabw.supabase.co";
 
 export const SUPABASE_ANON_KEY =
-  "YOUR_EXISTING_SB_PUBLISHABLE_KEY";
+  "sb_publishable_TlQ_lKkPrZkGn8jygB22SA_wJHxcKXp";
 
 export const WHATSAPP_NUMBER = "917305570219";
 
