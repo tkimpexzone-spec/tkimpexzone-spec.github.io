@@ -16,7 +16,41 @@ async function showApp(){
  $("loginView").hidden=true;$("appView").hidden=false;$("adminEmail").textContent=currentUser.email;
  await loadOverview();
 }
-$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginMessage").textContent="Signing in…";const f=new FormData(e.currentTarget);const {data,error}=await supabase.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){$("loginMessage").textContent=error.message;return;}currentUser=data.user;await showApp();});
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  if (!supabaseReady || !supabase) {
+    $("loginMessage").textContent =
+      "Supabase is not configured. Please check js/config.js.";
+    return;
+  }
+
+  const button = $("loginForm").querySelector('button[type="submit"]');
+
+  try {
+    button.disabled = true;
+    $("loginMessage").textContent = "Signing in…";
+
+    const f = new FormData(e.currentTarget);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: f.get("email").trim(),
+      password: f.get("password")
+    });
+
+    if (error) throw error;
+
+    currentUser = data.user;
+    await showApp();
+
+  } catch (error) {
+    console.error("Admin login error:", error);
+    $("loginMessage").textContent = error.message;
+
+  } finally {
+    button.disabled = false;
+  }
+});
 $("logoutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();location.reload();});
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
 function switchTab(tab){document.querySelectorAll(".admin-tab").forEach(s=>s.hidden=s.id!==`tab-${tab}`);document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("selected",b.dataset.tab===tab));$("pageTitle").textContent=tab[0].toUpperCase()+tab.slice(1);say("");if(tab==="products")loadProducts();if(tab==="banners")loadBanners();if(tab==="enquiries")loadEnquiries();}
